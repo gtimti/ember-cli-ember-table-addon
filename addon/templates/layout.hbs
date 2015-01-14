@@ -1,0 +1,9 @@
+{{#if controller.hasHeader}}
+  {{view view.headerTableContainer }}
+{{/if}}
+{{view view.bodyTableContainer }}
+{{#if controller.hasFooter}}
+  {{view view.footerTableContainer }}
+{{/if}}
+{{view view.scrollContainer }}
+{{view view.columnSortableIndicator }}
