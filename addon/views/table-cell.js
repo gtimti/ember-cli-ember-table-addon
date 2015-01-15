@@ -6,6 +6,7 @@ import template from 'ember-table/templates/table-cell';
 
 export default Ember.View.extend(StyleBindingsMixin, {
   template: template,
+
   classNames: ['ember-table-cell'],
   classNameBindings: 'column.textAlign',
   styleBindings: 'width',
@@ -16,7 +17,7 @@ export default Ember.View.extend(StyleBindingsMixin, {
   },
   row: Ember.computed.alias('parentView.row'),
   column: Ember.computed.alias('content'),
-  width: Ember.computed.alias('column.columnWidth'),
+  width: Ember.computed.alias('column.width'),
   contentDidChange: function() {
     return this.notifyPropertyChange('cellContent');
   },

@@ -15,14 +15,11 @@ import layout from 'ember-table/templates/layout';
 
 export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
 
-
   headerTableContainer: HeaderTableContainer,
   bodyTableContainer: BodyTableContainer,
   footerTableContainer: FooterTableContainer,
   scrollContainer: ScrollContainer,
   columnSortableIndicator: ColumnSortableIndicator,
-
-
 
   layout: layout,
   classNames: ['ember-table-tables-container'],
@@ -37,21 +34,27 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
   footerHeight: 30,
   hasHeader: true,
   hasFooter: true,
-  forceFillColumns: false,
   enableColumnReorder: true,
   enableContentSelection: false,
+  columnMode: 'standard',
   selectionMode: 'single',
   selection: Ember.computed(function(key, val) {
-    var content, _i, _len, _ref, _ref1;
+    var content, rowToAdd, _i, _len, _ref, _ref1;
     if (arguments.length > 1 && val) {
       if (this.get('selectionMode') === 'single') {
         this.get('persistedSelection').clear();
-        this.get('persistedSelection').addObject(this.findRow(val));
+        rowToAdd = this.findRow(val);
+        if (rowToAdd) {
+          this.get('persistedSelection').addObject(rowToAdd);
+        }
       } else {
         this.get('persistedSelection').clear();
         for (_i = 0, _len = val.length; _i < _len; _i++) {
           content = val[_i];
-          this.get('persistedSelection').addObject(this.findRow(content));
+          rowToAdd = this.findRow(content);
+          if (rowToAdd) {
+            this.get('persistedSelection').addObject(rowToAdd);
+          }
         }
       }
       this.get('rangeSelection').clear();
@@ -59,11 +62,12 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
     if (this.get('selectionMode') === 'single') {
       return (_ref = this.get('_selection')) != null ? (_ref1 = _ref[0]) != null ? _ref1.get('content') : void 0 : void 0;
     } else {
-      return this.get('_selection').toArray().map(function(row) {
+      return this.get('_selection').map(function(row) {
         return row.get('content');
       });
     }
   }).property('_selection.[]', 'selectionMode'),
+  columnsFillTable: true,
   init: function() {
     this._super();
     if (!$.ui) {
@@ -87,7 +91,8 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
     var columns;
     columns = this.get('tableColumns');
     columns.removeObject(column);
-    return columns.insertAt(newIndex, column);
+    columns.insertAt(newIndex, column);
+    return this.prepareTableColumns();
   },
   bodyContent: Ember.computed(function() {
     return RowArrayController.create({
@@ -113,7 +118,7 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
     }
     numFixedColumns = this.get('numFixedColumns') || 0;
     columns = columns.slice(0, numFixedColumns) || [];
-    this.prepareTableColumns(columns);
+    this.prepareTableColumns();
     return columns;
   }).property('columns.@each', 'numFixedColumns'),
   tableColumns: Ember.computed(function() {
@@ -124,18 +129,42 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
     }
     numFixedColumns = this.get('numFixedColumns') || 0;
     columns = columns.slice(numFixedColumns, columns.get('length')) || [];
-    this.prepareTableColumns(columns);
+    this.prepareTableColumns();
     return columns;
   }).property('columns.@each', 'numFixedColumns'),
-  prepareTableColumns: function(columns) {
-    return columns.setEach('controller', this);
+  allColumns: Ember.computed.union('fixedColumns', 'tableColumns'),
+  prepareTableColumns: function() {
+    var col, columns, i, _i, _len, _results;
+    columns = this.get('columns') || Ember.A();
+    columns.setEach('controller', this);
+    _results = [];
+    for (i = _i = 0, _len = columns.length; _i < _len; i = ++_i) {
+      col = columns[i];
+      _results.push(col.set('nextResizableColumn', this.getNextResizableColumn(columns, i)));
+    }
+    return _results;
+  },
+  getNextResizableColumn: function(columns, index) {
+    var column;
+    while (index < columns.length) {
+      index += 1;
+      column = columns.objectAt(index);
+      if (column != null ? column.get('isResizable') : void 0) {
+        return column;
+      }
+    }
+    return null;
   },
   didInsertElement: function() {
     this._super();
     this.set('_tableScrollTop', 0);
     Ember.run.next(this, this.elementSizeDidChange);
+    return this.doForceFillColumns();
   },
   onResizeEnd: function() {
+    if (this.tableWidthNowTooSmall()) {
+      this.set('columnsFillTable', true);
+    }
     return Ember.run(this, this.elementSizeDidChange);
   },
   elementSizeDidChange: function() {
@@ -146,30 +175,64 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
     this.set('_height', this.$().parent().outerHeight());
     return Ember.run.next(this, this.updateLayout);
   },
+  tableWidthNowTooSmall: function() {
+    var newTableWidth, oldTableWidth, totalColumnWidth;
+    oldTableWidth = this.get('_width');
+    newTableWidth = this.$().parent().outerWidth();
+    totalColumnWidth = this._getTotalWidth(this.get('tableColumns'));
+    return (oldTableWidth > totalColumnWidth) && (newTableWidth < totalColumnWidth);
+  },
+  expandResizeableColumnsToFillTable: function() {
+    var fixedColumnsWidth, tableColumns, totalResizableWidth, totalWidth, unresizableColumns, unresizableWidth;
+    totalWidth = this.get('_width');
+    fixedColumnsWidth = this.get('_fixedColumnsWidth');
+    tableColumns = this.get('tableColumns');
+    unresizableColumns = tableColumns.filterProperty('canAutoResize', false);
+    unresizableWidth = this._getTotalWidth(unresizableColumns);
+    return totalResizableWidth = totalWidth - unresizableWidth;
+  },
   updateLayout: function() {
     if ((this.get('_state') || this.get('state')) !== 'inDOM') {
       return;
     }
     this.$('.antiscroll-wrap').antiscroll().data('antiscroll').rebuild();
-    if (this.get('forceFillColumns')) {
+    if (this.get('columnsFillTable')) {
       return this.doForceFillColumns();
     }
   },
   doForceFillColumns: function() {
-    var additionWidthPerColumn, availableContentWidth, columnsToResize, contentWidth, fixedColumnsWidth, remainingWidth, tableColumns, totalWidth;
-    totalWidth = this.get('_width');
-    fixedColumnsWidth = this.get('_fixedColumnsWidth');
-    tableColumns = this.get('tableColumns');
-    contentWidth = this._getTotalWidth(tableColumns);
-    availableContentWidth = totalWidth - fixedColumnsWidth;
-    remainingWidth = availableContentWidth - contentWidth;
-    columnsToResize = tableColumns.filterProperty('canAutoResize');
-    additionWidthPerColumn = Math.floor(remainingWidth / columnsToResize.length);
-    return columnsToResize.forEach(function(column) {
-      var columnWidth;
-      columnWidth = column.get('columnWidth') + additionWidthPerColumn;
-      return column.set('columnWidth', columnWidth);
-    });
+    var allColumns, availableWidth, columnsToResize, doNextLoop, nextColumnsToResize, totalResizableWidth, unresizableColumns, _results;
+    allColumns = this.get('allColumns');
+    columnsToResize = allColumns.filterProperty('canAutoResize');
+    unresizableColumns = allColumns.filterProperty('canAutoResize', false);
+    availableWidth = this.get('_width') - this._getTotalWidth(unresizableColumns);
+    doNextLoop = true;
+    _results = [];
+    while (doNextLoop) {
+      doNextLoop = false;
+      nextColumnsToResize = [];
+      totalResizableWidth = this._getTotalWidth(columnsToResize);
+      columnsToResize.forEach((function(_this) {
+        return function(column) {
+          var newWidth;
+          newWidth = Math.floor((column.get('width') / totalResizableWidth) * availableWidth);
+          if (newWidth < column.get('minWidth')) {
+            doNextLoop = true;
+            column.set('width', column.get('minWidth'));
+            return availableWidth -= column.get('width');
+          } else if (newWidth > column.get('maxWidth')) {
+            doNextLoop = true;
+            column.set('width', column.get('maxWidth'));
+            return availableWidth -= column.get('width');
+          } else {
+            column.set('width', newWidth);
+            return nextColumnsToResize.pushObject(column);
+          }
+        };
+      })(this));
+      _results.push(columnsToResize = nextColumnsToResize);
+    }
+    return _results;
   },
   onBodyContentLengthDidChange: Ember.observer(function() {
     return Ember.run.next(this, function() {
@@ -213,17 +276,17 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
   }).property('_height', '_tableContentHeight', '_headerHeight', '_footerHeight'),
   _fixedColumnsWidth: Ember.computed(function() {
     return this._getTotalWidth(this.get('fixedColumns'));
-  }).property('fixedColumns.@each.columnWidth'),
+  }).property('fixedColumns.@each.width'),
   _tableColumnsWidth: Ember.computed(function() {
     var availableWidth, contentWidth;
-    contentWidth = (this._getTotalWidth(this.get('tableColumns'))) + 3;
+    contentWidth = this._getTotalWidth(this.get('tableColumns')) + 3;
     availableWidth = this.get('_width') - this.get('_fixedColumnsWidth');
     if (contentWidth > availableWidth) {
       return contentWidth;
     } else {
       return availableWidth;
     }
-  }).property('tableColumns.@each.columnWidth', '_width', '_fixedColumnsWidth'),
+  }).property('tableColumns.@each.width', '_width', '_fixedColumnsWidth'),
   _rowWidth: Ember.computed(function() {
     var columnsWidth, nonFixedTableWidth;
     columnsWidth = this.get('_tableColumnsWidth');
@@ -295,8 +358,8 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
   }).property('bodyContent.length', '_numItemsShowing', 'rowHeight', '_tableScrollTop'),
   _getTotalWidth: function(columns, columnWidthPath) {
     var widths;
-    if (!columnWidthPath) {
-      columnWidthPath = 'columnWidth';
+    if (columnWidthPath == null) {
+      columnWidthPath = 'width';
     }
     if (!columns) {
       return 0;
@@ -318,17 +381,13 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
     }
   },
   persistedSelection: Ember.computed(function() {
-    return Ember.ArrayProxy.createWithMixins(Ember.MutableArray, {
-      content: []
-    });
+    return Ember.A();
   }),
   rangeSelection: Ember.computed(function() {
-    return Ember.ArrayProxy.createWithMixins(Ember.MutableArray, {
-      content: []
-    });
+    return Ember.A();
   }),
   _selection: Ember.computed(function() {
-    return this.get('persistedSelection').toArray().copy().addObjects(this.get('rangeSelection'));
+    return this.get('persistedSelection').copy().addObjects(this.get('rangeSelection'));
   }).property('persistedSelection.[]', 'rangeSelection.[]'),
   click: function(event) {
     var curIndex, lastIndex, maxIndex, minIndex, row;

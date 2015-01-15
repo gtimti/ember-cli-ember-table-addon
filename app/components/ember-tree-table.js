@@ -7,7 +7,7 @@ var get = Ember.get;
 
 export default Table.extend({
   isCollapsed: false,
-  selection: null,
+  // selection: null,
 
   actions: {
     toggleTableCollapse: function() {

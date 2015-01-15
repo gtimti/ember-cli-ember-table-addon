@@ -1,13 +1,13 @@
 export default Ember.Object.extend({
   headerCellName: void 0,
   contentPath: void 0,
-  minWidth: void 0,
+  minWidth: 25,
   maxWidth: void 0,
-  defaultColumnWidth: 150,
+  savedWidth: 150,
   isResizable: true,
   isSortable: true,
   textAlign: 'text-align-right',
-  canAutoResize: true,
+  canAutoResize: false,
   headerCellView: 'ember-table/header-cell',
   headerCellViewClass: Ember.computed.alias('headerCellView'),
   tableCellView: 'ember-table/table-cell',
@@ -19,8 +19,17 @@ export default Ember.Object.extend({
     return Ember.get(row, path);
   },
   setCellContent: Ember.K,
-  columnWidth: Ember.computed.oneWay('defaultColumnWidth'),
+  width: Ember.computed.oneWay('savedWidth'),
   resize: function(width) {
-    return this.set('columnWidth', width);
-  }
+    this.set('savedWidth', width);
+    return this.set('width', width);
+  },
+  nextColumn: null,
+  prevColumn: null,
+  isAtMinWidth: Ember.computed(function() {
+    return this.get('width') === this.get('minWidth');
+  }).property('width', 'minWidth'),
+  isAtMaxWidth: Ember.computed(function() {
+    return this.get('width') === this.get('maxWidth');
+  }).property('width', 'maxWidth')
 });

@@ -7,10 +7,10 @@ import MultiItemViewCollectionView from 'ember-table/views/multi-item-view-colle
 import template from 'ember-table/templates/table-row';
 
 export default LazyItemView.extend({
-  template: template,
 
   multiItemViewCollectionView: MultiItemViewCollectionView,
 
+  template: template,
   classNames: 'ember-table-table-row',
   classNameBindings: ['row.isHovered:ember-table-hover', 'row.isSelected:ember-table-selected', 'row.rowStyle', 'isLastRow:ember-table-last-row'],
   styleBindings: ['width', 'height'],
