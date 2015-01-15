@@ -133,7 +133,7 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
   didInsertElement: function() {
     this._super();
     this.set('_tableScrollTop', 0);
-    return this.elementSizeDidChange();
+    Ember.run.next(this, this.elementSizeDidChange);
   },
   onResizeEnd: function() {
     return Ember.run(this, this.elementSizeDidChange);
