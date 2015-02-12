@@ -4,7 +4,7 @@ import LazyItemView from 'ember-table/views/lazy-item';
 
 import MultiItemViewCollectionView from 'ember-table/views/multi-item-view-collection';
 
-import template from 'ember-table/templates/table-row';
+import template from 'ember-table/_templates/table-row';
 
 export default LazyItemView.extend({
 

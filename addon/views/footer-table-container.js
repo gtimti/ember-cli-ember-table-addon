@@ -8,7 +8,7 @@ import TableContainer from 'ember-table/views/table-container';
 
 import TableBlock from 'ember-table/views/table-block';
 
-import template from 'ember-table/templates/footer-container';
+import template from 'ember-table/_templates/footer-container';
 
 export default TableContainer.extend(MouseWheelHandlerMixin, TouchMoveHandlerMixin, ShowHorizontalScrollMixin, {
   template: template,

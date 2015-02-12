@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 
-import template from 'ember-table/templates/header-cell';
+import template from 'ember-table/_templates/header-cell';
 
 export default Ember.View.extend(StyleBindingsMixin, {
   template: template,
@@ -50,8 +50,8 @@ export default Ember.View.extend(StyleBindingsMixin, {
       minWidth: Math.max(this.get('effectiveMinWidth') || 0, 10),
       maxWidth: this.get('effectiveMaxWidth'),
       grid: this.get('column.snapGrid'),
-      resize: jQuery.proxy(this.onColumnResize, this),
-      stop: jQuery.proxy(this.onColumnResize, this)
+      resize: Ember.$.proxy(this.onColumnResize, this),
+      stop: Ember.$.proxy(this.onColumnResize, this)
     };
   }).property('effectiveMinWidth', 'effectiveMaxWidth'),
   didInsertElement: function() {

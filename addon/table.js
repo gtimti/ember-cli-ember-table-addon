@@ -11,7 +11,7 @@ import FooterTableContainer from 'ember-table/views/footer-table-container';
 import ScrollContainer from 'ember-table/views/scroll-container';
 import ColumnSortableIndicator from 'ember-table/views/column-sortable-indicator';
 
-import layout from 'ember-table/templates/layout';
+import layout from 'ember-table/_templates/layout';
 
 export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
 
@@ -212,7 +212,7 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
       doNextLoop = false;
       nextColumnsToResize = [];
       totalResizableWidth = this._getTotalWidth(columnsToResize);
-      columnsToResize.forEach((function(_this) {
+      columnsToResize.forEach(function() {
         return function(column) {
           var newWidth;
           newWidth = Math.floor((column.get('width') / totalResizableWidth) * availableWidth);
@@ -229,7 +229,7 @@ export default Ember.Component.extend(StyleBindingsMixin, ResizeHandlerMixin, {
             return nextColumnsToResize.pushObject(column);
           }
         };
-      })(this));
+      });
       _results.push(columnsToResize = nextColumnsToResize);
     }
     return _results;

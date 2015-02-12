@@ -6,7 +6,7 @@ import TableContainer from 'ember-table/views/table-container';
 
 import HeaderBlock from 'ember-table/views/header-block';
 
-import template from 'ember-table/templates/header-container';
+import template from 'ember-table/_templates/header-container';
 
 export default TableContainer.extend(ShowHorizontalScrollMixin, {
   template: template,

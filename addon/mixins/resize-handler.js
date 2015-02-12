@@ -39,11 +39,11 @@ export default Ember.Mixin.create({
     if (this._resizeHandler) {
       return;
     }
-    this._resizeHandler = jQuery.proxy(this.get('handleWindowResize'), this);
-    return jQuery(window).on("resize." + this.elementId, this._resizeHandler);
+    this._resizeHandler = Ember.$.proxy(this.get('handleWindowResize'), this);
+    return Ember.$(window).on("resize." + this.elementId, this._resizeHandler);
   },
   _removeDocumentHandlers: function() {
-    jQuery(window).off("resize." + this.elementId, this._resizeHandler);
+    Ember.$(window).off("resize." + this.elementId, this._resizeHandler);
     this._resizeHandler = null;
   }
 });

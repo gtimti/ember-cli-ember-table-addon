@@ -5,7 +5,7 @@ import ScrollHandlerMixin from 'ember-table/mixins/scroll-handler';
 
 import ScrollPanel from 'ember-table/views/scroll-panel';
 
-import template from 'ember-table/templates/scroll-container';
+import template from 'ember-table/_templates/scroll-container';
 
 export default Ember.View.extend(StyleBindingsMixin, ScrollHandlerMixin, {
   template: template,

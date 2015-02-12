@@ -9,7 +9,7 @@ import TableContainer from 'ember-table/views/table-container';
 
 import LazyTableBlock from 'ember-table/views/lazy-table-block';
 
-import template from 'ember-table/templates/body-container';
+import template from 'ember-table/_templates/body-container';
 
 export default TableContainer.extend(MouseWheelHandlerMixin, TouchMoveHandlerMixin, ScrollHandlerMixin, ShowHorizontalScrollMixin, {
   template: template,

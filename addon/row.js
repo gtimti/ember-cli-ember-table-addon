@@ -1,3 +1,5 @@
+import Ember from 'ember';
+
 export default Ember.ObjectProxy.extend({
   content: null,
   isSelected: Ember.computed(function(key, val) {

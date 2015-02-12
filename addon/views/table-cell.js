@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 
-import template from 'ember-table/templates/table-cell';
+import template from 'ember-table/_templates/table-cell';
 
 export default Ember.View.extend(StyleBindingsMixin, {
   template: template,

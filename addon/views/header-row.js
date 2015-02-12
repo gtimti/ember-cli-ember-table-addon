@@ -4,7 +4,7 @@ import StyleBindingsMixin from 'ember-table/mixins/style-bindings';
 
 import MultiItemViewCollectionView from 'ember-table/views/multi-item-view-collection';
 
-import template from 'ember-table/templates/header-row';
+import template from 'ember-table/_templates/header-row';
 
 export default Ember.View.extend(StyleBindingsMixin, {
   template: template,
@@ -27,9 +27,9 @@ export default Ember.View.extend(StyleBindingsMixin, {
       placeholder: 'ui-state-highlight',
       scroll: true,
       tolerance: 'intersect',
-      update: jQuery.proxy(this.onColumnSortDone, this),
-      stop: jQuery.proxy(this.onColumnSortStop, this),
-      sort: jQuery.proxy(this.onColumnSortChange, this)
+      update: Ember.$.proxy(this.onColumnSortDone, this),
+      stop: Ember.$.proxy(this.onColumnSortStop, this),
+      sort: Ember.$.proxy(this.onColumnSortChange, this)
     };
   }),
   onScrollLeftDidChange: Ember.observer(function() {
