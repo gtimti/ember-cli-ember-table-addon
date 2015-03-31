@@ -1,0 +1,9 @@
+{{#if hasHeader}}
+  {{view "table/header-container"}}
+{{/if}}
+{{view "table/body-container"}}
+{{#if hasFooter}}
+  {{view "table/footer-container"}}
+{{/if}}
+{{view "table/scroll-container"}}
+{{view "table/column-sortable-indicator"}}

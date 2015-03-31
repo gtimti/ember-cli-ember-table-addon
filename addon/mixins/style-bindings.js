@@ -1,3 +1,4 @@
+// TODO(azirbel): This needs to be an external dependency.
 import Ember from 'ember';
 
 export default Ember.Mixin.create({
@@ -41,7 +42,7 @@ export default Ember.Mixin.create({
       });
       styleString = styleTokens.join('');
       if (styleString.length !== 0) {
-        return styleString;
+        return Ember.String.htmlSafe(styleString);
       }
     });
     styleComputed.property.apply(styleComputed, properties);

@@ -3,14 +3,14 @@ import Ember from 'ember';
 export default Ember.ArrayController.extend({
   itemController: null,
   content: null,
+
   rowContent: Ember.computed(function() {
     return [];
   }).property(),
-  controllerAt: function(idx, object, controllerClass) {
-    var container, subController, subControllers;
-    container = this.get('container');
-    subControllers = this.get('_subControllers');
-    subController = subControllers[idx];
+
+  controllerAt: function(idx, object) {
+    var subControllers = this.get('_subControllers');
+    var subController = subControllers[idx];
     if (subController) {
       return subController;
     }

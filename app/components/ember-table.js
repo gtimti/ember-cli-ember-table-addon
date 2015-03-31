@@ -1,3 +1,3 @@
-import Table from 'ember-table/table';
+import Table from 'ember-table/components/table';
 
 export default Table;
