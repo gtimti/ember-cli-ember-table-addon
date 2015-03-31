@@ -49,7 +49,7 @@ StyleBindingsMixin, ResizeHandlerMixin, {
 
   // The footer height in pixels.
   // TODO: Currently must be kept in sync with the LESS file.
-  footerHeight: 22,
+  footerHeight: 8,
 
   // Enables or disables the header block.
   hasHeader: true,
